@@ -7,7 +7,7 @@ import subprocess
 def flip(p):
     return random.random() < p
 
-def generate_test ( filenum, length, balancedProb ):
+def generate_test ( filenum, length, balancedProb, prefix=None ):
 
     braces = {
         0: ('<','>'),
@@ -37,10 +37,10 @@ def generate_test ( filenum, length, balancedProb ):
         string += stack.pop()[1]
 
     # print (string)
-    with open("tests/test{}.txt".format(filenum), "w") as infile:
+    with open("{}tests/test{}.txt".format(prefix if prefix else "",filenum), "w") as infile:
         infile.write(string)
 
-    with open("answers/answer{}.txt".format(filenum), "w") as outfile:
+    with open("{}answers/answer{}.txt".format(prefix if prefix else "",filenum), "w") as outfile:
         outfile.write("yes" if allBalanced else "no")
 
 def generate_test_suite():
@@ -57,14 +57,15 @@ def generate_test_suite():
     generate_test ( 4, 256, 0.999 )
     generate_test ( 5, 256, 0.9 )
 
-def test_balanced( filenum, verbose ):
+def test_balanced( filenum, prefix=None, verbose=False ):
 
-    command = "./balanced tests/test{}.txt".format(filenum)
+    command = prefix if prefix else "."
+    command += "/balanced {}tests/test{}.txt".format(prefix if prefix else "",filenum)
     if verbose:
         print (command)
 
     try:
-        with open("answers/answer{}.txt".format(filenum), "r") as outfile:
+        with open("{}answers/answer{}.txt".format(prefix if prefix else "",filenum), "r") as outfile:
             answer = outfile.read()
     except EnvironmentError: # parent of IOError, OSError
         print ("answers/answer{}.txt missing".format(filenum))
@@ -84,37 +85,39 @@ def test_balanced( filenum, verbose ):
 
     return False
 
-def grade_balanced( verbose ):
+def grade_balanced( prefix=None, verbose=False ):
 
     score = 0
 
     command = "make"
+    if prefix:
+        command += " --directory=" + prefix
     if verbose:
         print (command)
     try:
-        subprocess.check_output(command)
+        subprocess.check_output(command, shell=True)
         score += 5
     except subprocess.CalledProcessError as e:
         print ("Couldn't compile balanced.")
         return score
 
-    if test_balanced(0,verbose):
+    if test_balanced(0,prefix,verbose):
         score += 2
-        if test_balanced(1,verbose):
+        if test_balanced(1,prefix,verbose):
             score += 2
-            if test_balanced(2,verbose):
+            if test_balanced(2,prefix,verbose):
                 score += 3
-                if test_balanced(3,verbose):
+                if test_balanced(3,prefix,verbose):
                     score += 3
-                    if test_balanced(4,verbose):
+                    if test_balanced(4,prefix,verbose):
                         score += 3
-                        if test_balanced(5,verbose):
+                        if test_balanced(5,prefix,verbose):
                             score += 3
 
                             allpass = True
                             for filenum in range(6,12):
-                                generate_test ( filenum, 65536, 0.99998 )
-                                allpass &= test_balanced(filenum, verbose)
+                                generate_test ( filenum, 65536, 0.99998, prefix )
+                                allpass &= test_balanced(filenum,prefix,verbose)
                             if allpass:
                                 score += 6
 

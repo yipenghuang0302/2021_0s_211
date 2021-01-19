@@ -22,9 +22,10 @@ def validate_string( number, string ):
     assert is_prime(rval[2]), "{} not a prime number.".format(rval[2])
     assert rval[0]+rval[1]+rval[2] == number, "Three numbers should sum to the original number."
 
-def test_goldbach( number, verbose ):
+def test_goldbach( number, prefix=None, verbose=False ):
 
-    command = "./goldbach {}".format(number)
+    command = prefix if prefix else '.'
+    command += "/goldbach {}".format(number)
     if verbose:
         print (command)
     try:
@@ -40,30 +41,32 @@ def test_goldbach( number, verbose ):
 
     return False
 
-def grade_goldbach( verbose ):
+def grade_goldbach( prefix=None, verbose=False ):
 
     score = 0
 
     command = "make"
+    if prefix:
+        command += " --directory=" + prefix
     if verbose:
         print (command)
     try:
-        subprocess.check_output(command)
+        subprocess.check_output(command, shell=True)
         score += 5
     except subprocess.CalledProcessError as e:
         print ("Couldn't compile goldbach.")
         return score
 
-    if test_goldbach(7,verbose):
+    if test_goldbach(7,prefix,verbose):
         score += 5
 
-        if test_goldbach(49,verbose):
+        if test_goldbach(49,prefix,verbose):
             score += 5
 
             allpass = True
-            for _ in range(100):
-                number = random.randrange(3,10000)*2 + 1
-                allpass &= test_goldbach(number, verbose)
+            for _ in range(20):
+                number = random.randrange(3,100)*2 + 1
+                allpass &= test_goldbach(number,prefix,verbose)
             if allpass:
                 score += 12
 
