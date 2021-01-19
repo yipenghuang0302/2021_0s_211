@@ -1,0 +1,18 @@
+To compile your source code goldbach.c, you can type:
+$	gcc -Wall -Werror -fsanitize=address -std=c99 -o goldbach goldbach.c -lm
+We've provided several important useful compiler flags.
+
+Alternatively, to build the executable, you can type:
+$ make
+
+Once your program is successfully compiled, you can run your program:
+$ ./goldbach 7
+
+To use the autograder script to test your program, you can type:
+$ ./autograder
+or
+$ python autograder
+
+We will be using the autograder as you see it here to assign your grade.
+You can check if you have accidentally modified your autograder:
+$ git diff autograder.py
