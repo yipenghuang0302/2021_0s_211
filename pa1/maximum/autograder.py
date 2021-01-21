@@ -76,22 +76,22 @@ def grade_maximum( prefix=None, verbose=False ):
         return score
 
     if test_maximum(0,prefix,verbose):
-        score += 4
+        score += 3
         if test_maximum(1,prefix,verbose):
-            score += 4
+            score += 3
             if test_maximum(2,prefix,verbose):
-                score += 4
+                score += 3
                 if test_maximum(3,prefix,verbose):
-                    score += 4
+                    score += 3
 
                     allpass = True
                     for filenum in range(4,6):
                         generate_test ( filenum, 16, 2147483647, prefix )
                         allpass &= test_maximum(filenum,prefix,verbose)
                     if allpass:
-                        score += 6
+                        score += 5
 
-    print ("Score on maximum: {} out of 27.".format(score))
+    print ("Score on maximum: {} out of 22.".format(score))
     return score
 
 if __name__ == '__main__':

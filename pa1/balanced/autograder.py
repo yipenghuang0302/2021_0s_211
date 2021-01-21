@@ -106,9 +106,9 @@ def grade_balanced( prefix=None, verbose=False ):
         if test_balanced(1,prefix,verbose):
             score += 2
             if test_balanced(2,prefix,verbose):
-                score += 3
+                score += 2
                 if test_balanced(3,prefix,verbose):
-                    score += 3
+                    score += 2
                     if test_balanced(4,prefix,verbose):
                         score += 3
                         if test_balanced(5,prefix,verbose):
@@ -119,9 +119,9 @@ def grade_balanced( prefix=None, verbose=False ):
                                 generate_test ( filenum, 65536, 0.99998, prefix )
                                 allpass &= test_balanced(filenum,prefix,verbose)
                             if allpass:
-                                score += 6
+                                score += 3
 
-    print ("Score on balanced: {} out of 27.".format(score))
+    print ("Score on balanced: {} out of 22.".format(score))
     return score
 
 if __name__ == '__main__':

@@ -68,9 +68,9 @@ def grade_goldbach( prefix=None, verbose=False ):
                 number = random.randrange(3,100)*2 + 1
                 allpass &= test_goldbach(number,prefix,verbose)
             if allpass:
-                score += 12
+                score += 7
 
-    print ("Score on goldbach: {} out of 27.".format(score))
+    print ("Score on goldbach: {} out of 22.".format(score))
     return score
 
 if __name__ == '__main__':

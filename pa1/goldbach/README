@@ -1,3 +1,6 @@
+First, you should rename goldbach_provided.c to goldbach.c by entering:
+$ mv goldbach_provided.c goldbach.c
+
 To compile your source code goldbach.c, you can type:
 $	gcc -Wall -Werror -fsanitize=address -std=c99 -o goldbach goldbach.c -lm
 We've provided several important useful compiler flags.
