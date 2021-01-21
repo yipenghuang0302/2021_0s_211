@@ -114,7 +114,7 @@ def grade_bstReverseOrder( prefix=None, verbose=False ):
                     score += 3
 
                     allpass = True
-                    for filenum in range(3,8):
+                    for filenum in range(4,8):
                         generate_test ( filenum, 1024, prefix )
                         allpass &= test_bstReverseOrder(filenum,prefix,verbose)
                     if allpass:

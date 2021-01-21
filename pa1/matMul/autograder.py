@@ -41,8 +41,8 @@ def generate_test_suite():
 
     generate_test ( 0, 1, 1, 1 )
     generate_test ( 1, 1, 4, 1 )
-    generate_test ( 2, 2, 2, 2 )
-    generate_test ( 3, 2, 3, 4 )
+    generate_test ( 2, 3, 2, 1 )
+    generate_test ( 3, 2, 2, 2 )
 
 def test_matMul ( filenum, prefix=None, verbose=False ):
 
@@ -101,8 +101,8 @@ def grade_matMul( prefix=None, verbose=False ):
                     score += 3
 
                     allpass = True
-                    for filenum in range(3,8):
-                        generate_test ( filenum, 5, 4, 3, prefix )
+                    for filenum in range(4,8):
+                        generate_test ( filenum, 3, 4, 5, prefix )
                         allpass &= test_matMul(filenum,prefix,verbose)
                     if allpass:
                         score += 5
