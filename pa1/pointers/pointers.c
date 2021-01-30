@@ -1,7 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+void swap_values ( int a, int b );
+void swap_references ( int* a_pointer, int* b_pointer );
 int * modify_array (int size, int param[]);
+int factorial(int n);
 
 int main() {
 
@@ -52,10 +55,23 @@ int main() {
     printf("*(array+%d) = %d\n", i, *(array+i));
   }
 
+  printf ("\n\nLESSON 7: PASSING-BY-VALUE\n");
+  int a = 211;
+  int b = 422;
+  printf ("before swap_values: a = %d\n", a);
+  printf ("before swap_values: b = %d\n", b);
+  swap_values (a,b);
+  printf ("after swap_values:  a = %d\n", a);
+  printf ("after swap_values:  b = %d\n", b);
 
+  printf ("\n\nLESSON 8: PASSING-BY-REFERENCE\n");
+  printf ("before swap_references: a = %d\n", a);
+  printf ("before swap_references: b = %d\n", b);
+  swap_references ( &a, &b );
+  printf ("after swap_references:  a = %d\n", a);
+  printf ("after swap_references:  b = %d\n", b);
 
-
-  printf ("\n\nLESSON 7: PASSING BY VALUE\n");
+  printf ("\n\nLESSON 9: PASSING AN ARRAY LEADS TO PASSING-BY-REFERENCE\n");
   int* returned_array = modify_array(array_size, array);
   for (int i=0; i<array_size; i++) {
     printf("returned_array[%d] = %d\n", i, returned_array[i]);
@@ -64,8 +80,24 @@ int main() {
     printf("array[%d]    = %d\n", i, array[i]);
   }
 
+  printf ("\n\nLESSON 10: HOW THE STACK WORKS; RECURSION EXAMPLE\n");
+  int n = 3;
+  printf ("%d! = %d\n", n, factorial(n));
+
   free(array);
   return 0;
+}
+
+void swap_values ( int a, int b ) {
+  int temp = b;
+  b = a;
+  a = temp;
+}
+
+void swap_references ( int* a_pointer, int* b_pointer ) {
+  int temp = *b_pointer;
+  *b_pointer = *a_pointer;
+  *a_pointer = temp;
 }
 
 int* modify_array (int size, int param[]) {
@@ -73,4 +105,10 @@ int* modify_array (int size, int param[]) {
     param[i] = 211 + i;
   }
   return param;
+}
+
+int factorial(int n) {
+  printf ("In the call to factorial(%d), the parameter was stored at: %ld\n", n, (unsigned long) &n);
+  if (n==1) return 1;
+  else return n*factorial(n-1);
 }
