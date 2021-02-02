@@ -1,10 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void swap_values ( int a, int b );
-void swap_references ( int* a_pointer, int* b_pointer );
+void swap_pass_by_values ( int a, int b );
+void swap_pass_by_references ( int* a_pointer, int* b_pointer );
 int * modify_array (int size, int param[]);
 int factorial(int n);
+
+int global_variable = 0;
 
 int main() {
 
@@ -58,18 +60,22 @@ int main() {
   printf ("\n\nLESSON 7: PASSING-BY-VALUE\n");
   int a = 211;
   int b = 422;
-  printf ("before swap_values: a = %d\n", a);
-  printf ("before swap_values: b = %d\n", b);
-  swap_values (a,b);
-  printf ("after swap_values:  a = %d\n", a);
-  printf ("after swap_values:  b = %d\n", b);
+  printf ("before swap_pass_by_values:   a = %d\n", a);
+  printf ("before swap_pass_by_values:   b = %d\n", b);
+  printf ("outside swap_pass_by_values: &a = %ld\n", (long int) &a);
+  printf ("outside swap_pass_by_values: &b = %ld\n", (long int) &b);
+  swap_pass_by_values (a,b);
+  printf ("after swap_pass_by_values:    a = %d\n", a);
+  printf ("after swap_pass_by_values:    b = %d\n", b);
 
   printf ("\n\nLESSON 8: PASSING-BY-REFERENCE\n");
-  printf ("before swap_references: a = %d\n", a);
-  printf ("before swap_references: b = %d\n", b);
-  swap_references ( &a, &b );
-  printf ("after swap_references:  a = %d\n", a);
-  printf ("after swap_references:  b = %d\n", b);
+  printf ("before swap_pass_by_references:   a = %d\n", a);
+  printf ("before swap_pass_by_references:   b = %d\n", b);
+  printf ("outside swap_pass_by_references: &a = %ld\n", (long int) &a);
+  printf ("outside swap_pass_by_references: &b = %ld\n", (long int) &b);
+  swap_pass_by_references ( &a, &b );
+  printf ("after swap_pass_by_references:    a = %d\n", a);
+  printf ("after swap_pass_by_references:    b = %d\n", b);
 
   printf ("\n\nLESSON 9: PASSING AN ARRAY LEADS TO PASSING-BY-REFERENCE\n");
   int* returned_array = modify_array(array_size, array);
@@ -80,7 +86,9 @@ int main() {
     printf("array[%d]    = %d\n", i, array[i]);
   }
 
-  printf ("\n\nLESSON 10: HOW THE STACK WORKS; RECURSION EXAMPLE\n");
+  printf ("\n\nLESSON 10: C MEMORY MODEL; STACK AND HEAP; RECURSION EXAMPLE\n");
+  printf ("global_variable = %d\n", global_variable);
+  printf ("Address of global_variable = %ld\n", (long int) &global_variable);
   int n = 3;
   printf ("%d! = %d\n", n, factorial(n));
 
@@ -88,13 +96,17 @@ int main() {
   return 0;
 }
 
-void swap_values ( int a, int b ) {
+void swap_pass_by_values ( int a, int b ) {
+  printf ("inside swap_pass_by_values:  &a = %ld\n", (long int) &a);
+  printf ("inside swap_pass_by_values:  &b = %ld\n", (long int) &b);
   int temp = b;
   b = a;
   a = temp;
 }
 
-void swap_references ( int* a_pointer, int* b_pointer ) {
+void swap_pass_by_references ( int* a_pointer, int* b_pointer ) {
+  printf ("inside swap_pass_by_references:  &a = %ld\n", (long int) a_pointer);
+  printf ("inside swap_pass_by_references:  &b = %ld\n", (long int) b_pointer);
   int temp = *b_pointer;
   *b_pointer = *a_pointer;
   *a_pointer = temp;
@@ -108,7 +120,11 @@ int* modify_array (int size, int param[]) {
 }
 
 int factorial(int n) {
-  printf ("In the call to factorial(%d), the parameter was stored at: %ld\n", n, (unsigned long) &n);
+  printf ("In factorial(%d), the parameter was stored at: %ld\n", n, (unsigned long) &n);
   if (n==1) return 1;
-  else return n*factorial(n-1);
+  else {
+    int recurse = factorial(n-1);
+    printf ("In factorial(%d), the returned value from call to factorial(%d) was stored at: %ld\n", n, n-1, (unsigned long) &recurse);
+    return n*recurse;
+  }
 }
