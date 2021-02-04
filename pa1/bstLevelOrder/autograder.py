@@ -58,9 +58,9 @@ def generate_test_suite():
         os.mkdir("answers")
 
     generate_test ( 0, 1 )
-    generate_test ( 1, 4 )
-    generate_test ( 2, 16 )
-    generate_test ( 3, 256 )
+    generate_test ( 1, 2 )
+    generate_test ( 2, 4 )
+    generate_test ( 3, 8 )
 
 def test_bstLevelOrder ( filenum, prefix=None, verbose=False ):
 
@@ -129,6 +129,6 @@ def grade_bstLevelOrder( prefix=None, verbose=False ):
     return score
 
 if __name__ == '__main__':
-    generate_test_suite()
+    # generate_test_suite()
     grade_bstLevelOrder(verbose=True)
     exit()
