@@ -15,7 +15,7 @@ programs = ["balanced", "bstReverseOrder", "goldbach", "matMul", "maximum"] # pr
 # loop through all the tar files in the submissions folder
 for filename in os.listdir(submissions):
     if filename.endswith(".tar"):
-        print("Reading", os.path.join(submissions, filename))
+        print("\nReading", os.path.join(submissions, filename))
 
         id = filename.split('_')[1] # obtain student id from second part of tarball name
 
@@ -32,9 +32,17 @@ for filename in os.listdir(submissions):
 
         # check for changes to test and answer files
         for program in programs:
-            print(program)
+            print("\nChecking {}\n".format(program))
+
             tests = '/'.join([pa, program, "tests"])
             answers = '/'.join([pa, program, "answers"])
+
+            original_autograder = '/'.join([pa, program, "autograder.py"])
+            student_autograder = '/'.join([toGrade, program, "autograder.py"])
+            bash_command = "git diff {} {}".format(original_autograder, student_autograder)
+            if (bash_output != ""):
+                # overwrite with original
+                shutil.copyfile(original_autograder, student_autograder) #copy src to dst
 
             if os.path.isdir(tests):
                 for root, subdirectories, files in os.walk(tests):
