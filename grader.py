@@ -74,5 +74,6 @@ for filename in os.listdir(submissions):
 
         # REMAINING WORK:
         # run assignment_autograder.py in the 'toGrade' path
+        # set a time limit on the autograder running time
         # store results in grades dictionary
         # output grades to csv file
