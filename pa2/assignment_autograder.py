@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python2
 
 from edgelist import autograder as edgelist_autograder
 from isTree import autograder as isTree_autograder
