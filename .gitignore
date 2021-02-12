@@ -55,6 +55,8 @@ Module.symvers
 Mkfile.old
 dkms.conf
 
+*.txt
+*.png
 answer_key
 
 pa1/submissions
