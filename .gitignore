@@ -61,3 +61,5 @@ submissions.zip
 submissions
 answer_key
 *.csv
+*.xls
+*.xlsx
