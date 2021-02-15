@@ -162,6 +162,7 @@ def overwrite_autograder_files_if_modified(
 
 def invoke_make_clean(
     submission_dir: Path,
+    log_file: Path, 
 ) -> None:
     subparts = CONFIG.SUBPARTS
     for subpart_path in chain(
@@ -181,6 +182,9 @@ def invoke_make_clean(
         except subprocess.TimeoutExpired as ex:
             output = ex.stdout
             return 'timed out'
+        finally:
+            with log_file.open('a') as f: 
+                f.write(output) 
 
 
 def exec_grading_script(path: Path, log_file: Path) -> str:
@@ -202,7 +206,7 @@ def exec_grading_script(path: Path, log_file: Path) -> str:
         output = ex.stdout
         return 'assignment_autograder.py returend non-zero exit status 1.'
     finally:
-        with log_file.open('w') as f:
+        with log_file.open('a') as f:
             print(output)
             f.write(output)
 
@@ -233,13 +237,18 @@ def main(src_gradebook: Path, output_gradebook: Path) -> None:
             submission.extracted_path / CONFIG.CURRENT_PA,
         )
 
+        log_file_path = submission.tar_path.with_suffix('.log')
+        # clear contents of log file just in case 
+        open(log_file_path, "w").close() 
+
         invoke_make_clean(
             submission.extracted_path / CONFIG.CURRENT_PA,
+            log_file_path, 
         )
 
         grade = exec_grading_script(
             submission.extracted_path / CONFIG.CURRENT_PA / 'assignment_autograder.py',
-            submission.tar_path.with_suffix('.log'),
+            log_file_path,
         )
         grade_writer[submission.student_id] = grade
 
