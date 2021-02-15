@@ -1,5 +1,11 @@
 #!/usr/bin/python3
 
+# Authors:
+# Marie Petitjean mpetitjean22
+# Abhinav Sirohi Abhinavnj
+# Neeraj Mula Acryptarch
+# Yipeng Huang yipenghuang0302
+
 import csv
 import re
 import shutil
