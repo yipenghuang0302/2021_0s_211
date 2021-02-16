@@ -32,6 +32,12 @@ class CONFIG:
     TIME_LIMIT = timedelta(minutes=5)
 
 
+class Result(NamedTuple): 
+    final_grade: Optional[int] = None
+    subpart_grades: Optional[Dict[str, int]] = None
+    error_msg: Optional[str] = None 
+
+
 class StudentMetadataReader:
     def __init__(self, src_gradebook: Path) -> None:
         self._metadata_by_id: Dict[str, Dict[str, str]] = {}
@@ -70,8 +76,8 @@ class StudentGradeWriter:
         self._timed_out = False
         self._grades: Dict[str, str] = {}
 
-    def __setitem__(self, student_id: str, grade: str) -> None:
-        self._grades[student_id] = grade
+    def __setitem__(self, student_id: str, results: Result) -> None:
+        self._grades[student_id] = results
 
     def write_to_file(self, output_gradebook: Path) -> None:
         fieldnames = (
@@ -80,21 +86,25 @@ class StudentGradeWriter:
             'SIS User ID',
             'SIS Login ID',
             'Section',
-            self._assignment_name,
-        )
+            self._assignment_name,           
+        ) + tuple(CONFIG.SUBPARTS) 
 
         with output_gradebook.open('w', newline='') as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
             writer.writeheader()
 
-            for student_id, grade in self._grades.items():
+            for student_id, results in self._grades.items():
                 row = self._metadata[student_id]
                 if not row:
                     print(f'Student ID {student_id} not found.', file=sys.stderr)
                     continue
 
-                row[self._assignment_name] = grade
-
+                if not results.final_grade: 
+                    row[self._assignment_name] = results.error_msg
+                else: 
+                    row[self._assignment_name] = results.final_grade
+                    for subpart in CONFIG.SUBPARTS: 
+                        row[subpart] = results.subpart_grades[subpart] 
                 writer.writerow(row)
 
 
@@ -112,10 +122,13 @@ def iter_submissions(submissions_dir: Path) -> Generator[Submission, None, None]
         student_id = sub_tarball.name.split('_')[1]
         extract_dir = submissions_dir / f'tmp-{student_id}'
 
-        with tarfile.open(sub_tarball) as tarball:
-            tarball.extractall(extract_dir)
+        try: 
+            with tarfile.open(sub_tarball) as tarball:
+                    tarball.extractall(extract_dir)
 
-        yield Submission(sub_tarball, extract_dir, student_id)
+            yield Submission(sub_tarball, extract_dir, student_id)
+        except Exception: 
+            print(f'Failed to extract {sub_tarball}.')
 
         shutil.rmtree(extract_dir)
 
@@ -187,7 +200,7 @@ def invoke_make_clean(
                 f.write(output) 
 
 
-def exec_grading_script(path: Path, log_file: Path) -> str:
+def exec_grading_script(path: Path, log_file: Path) -> Result:
     try:
         result = subprocess.run(
             ['python3', str(path.name)],
@@ -201,24 +214,59 @@ def exec_grading_script(path: Path, log_file: Path) -> str:
         output = result.stdout
     except subprocess.TimeoutExpired as ex:
         output = ex.stdout
-        return 'timed out'
+        return Result(
+            error_msg='timed out'
+        )
+        
     except subprocess.CalledProcessError as ex:
         output = ex.stdout
-        return 'assignment_autograder.py returend non-zero exit status 1.'
+        return Result(
+            error_msg='assignment_autograder.py returend non-zero exit status 1.'
+        )
     finally:
         with log_file.open('a') as f:
             print(output)
             f.write(output)
+            return gather_results(output, log_file) 
+    
 
-    matches = re.findall(r'Score on assignment: (\d+) out of (\d+)\.', output)
+def find_matches_or_log(matcch_str: str, output: str, log_file: Path) -> str:
+    matches = re.findall(matcch_str, output) 
     if not matches:
         raise Exception(f'Unexpected assignment autograder output. See {log_file}.')
     if len(matches) > 1:
         raise Exception(
             f'Score regex has multiple matches which is suspicious. See {log_file}.'
         )
-
     return matches[0][0]
+
+
+def gather_results(output: str, log_file: Path) -> Result:
+    try:  
+        final_grade = find_matches_or_log(
+            r'Score on assignment: (\d+) out of (\d+)\.', 
+            output, 
+            log_file, 
+        )
+
+        subpart_grades = {} 
+        for subpart in CONFIG.SUBPARTS: 
+            subpart_grade = find_matches_or_log(
+                f'Score on {subpart}: (\\d+) out of (\\d+)\\.', 
+                output, 
+                log_file
+            )
+            subpart_grades[subpart] = subpart_grade
+            
+        return Result(
+            final_grade, 
+            subpart_grades,
+        )
+
+    except Exception: 
+        return Result(
+            error_msg=f'Could not gather results, see: {log_file}'
+        )
 
 
 def main(src_gradebook: Path, output_gradebook: Path) -> None:
@@ -246,11 +294,11 @@ def main(src_gradebook: Path, output_gradebook: Path) -> None:
             log_file_path, 
         )
 
-        grade = exec_grading_script(
+        results = exec_grading_script(
             submission.extracted_path / CONFIG.CURRENT_PA / 'assignment_autograder.py',
             log_file_path,
         )
-        grade_writer[submission.student_id] = grade
+        grade_writer[submission.student_id] = results
 
     grade_writer.write_to_file(output_gradebook)
 
