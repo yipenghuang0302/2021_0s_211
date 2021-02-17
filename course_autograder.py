@@ -8,6 +8,7 @@
 
 import csv
 import re
+import os
 import shutil
 import subprocess
 import sys
@@ -32,10 +33,10 @@ class CONFIG:
     TIME_LIMIT = timedelta(minutes=5)
 
 
-class Result(NamedTuple): 
+class Result(NamedTuple):
     final_grade: Optional[int] = None
     subpart_grades: Optional[Dict[str, int]] = None
-    error_msg: Optional[str] = None 
+    error_msg: Optional[str] = None
 
 
 class StudentMetadataReader:
@@ -86,8 +87,8 @@ class StudentGradeWriter:
             'SIS User ID',
             'SIS Login ID',
             'Section',
-            self._assignment_name,           
-        ) + tuple(CONFIG.SUBPARTS) 
+            self._assignment_name,
+        ) + tuple(CONFIG.SUBPARTS)
 
         with output_gradebook.open('w', newline='') as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
@@ -99,12 +100,12 @@ class StudentGradeWriter:
                     print(f'Student ID {student_id} not found.', file=sys.stderr)
                     continue
 
-                if not results.final_grade: 
+                if not results.final_grade:
                     row[self._assignment_name] = results.error_msg
-                else: 
+                else:
                     row[self._assignment_name] = results.final_grade
-                    for subpart in CONFIG.SUBPARTS: 
-                        row[subpart] = results.subpart_grades[subpart] 
+                    for subpart in CONFIG.SUBPARTS:
+                        row[subpart] = results.subpart_grades[subpart]
                 writer.writerow(row)
 
 
@@ -122,12 +123,12 @@ def iter_submissions(submissions_dir: Path) -> Generator[Submission, None, None]
         student_id = sub_tarball.name.split('_')[1]
         extract_dir = submissions_dir / f'tmp-{student_id}'
 
-        try: 
+        try:
             with tarfile.open(sub_tarball) as tarball:
                     tarball.extractall(extract_dir)
 
             yield Submission(sub_tarball, extract_dir, student_id)
-        except Exception: 
+        except Exception:
             print(f'Failed to extract {sub_tarball}.')
 
         shutil.rmtree(extract_dir)
@@ -170,12 +171,13 @@ def overwrite_autograder_files_if_modified(
 
             if not is_file_unchanged(sot_file, submission_file):
                 print(f'Detected modified file: {sot_file}')
+                os.makedirs(os.path.dirname(submission_file), exist_ok=True)
                 shutil.copyfile(sot_file, submission_file)
 
 
 def invoke_make_clean(
     submission_dir: Path,
-    log_file: Path, 
+    log_file: Path,
 ) -> None:
     subparts = CONFIG.SUBPARTS
     for subpart_path in chain(
@@ -196,8 +198,8 @@ def invoke_make_clean(
             output = ex.stdout
             return 'timed out'
         finally:
-            with log_file.open('a') as f: 
-                f.write(output) 
+            with log_file.open('a') as f:
+                f.write(output)
 
 
 def exec_grading_script(path: Path, log_file: Path) -> Result:
@@ -217,7 +219,7 @@ def exec_grading_script(path: Path, log_file: Path) -> Result:
         return Result(
             error_msg='timed out'
         )
-        
+
     except subprocess.CalledProcessError as ex:
         output = ex.stdout
         return Result(
@@ -226,12 +228,12 @@ def exec_grading_script(path: Path, log_file: Path) -> Result:
     finally:
         with log_file.open('a') as f:
             print(output)
-            f.write(output)
-            return gather_results(output, log_file) 
-    
+            f.write(output if output else "")
+            return gather_results(output, log_file)
+
 
 def find_matches_or_log(matcch_str: str, output: str, log_file: Path) -> str:
-    matches = re.findall(matcch_str, output) 
+    matches = re.findall(matcch_str, output)
     if not matches:
         raise Exception(f'Unexpected assignment autograder output. See {log_file}.')
     if len(matches) > 1:
@@ -242,28 +244,28 @@ def find_matches_or_log(matcch_str: str, output: str, log_file: Path) -> str:
 
 
 def gather_results(output: str, log_file: Path) -> Result:
-    try:  
+    try:
         final_grade = find_matches_or_log(
-            r'Score on assignment: (\d+) out of (\d+)\.', 
-            output, 
-            log_file, 
+            r'Score on assignment: (\d+) out of (\d+)\.',
+            output,
+            log_file,
         )
 
-        subpart_grades = {} 
-        for subpart in CONFIG.SUBPARTS: 
+        subpart_grades = {}
+        for subpart in CONFIG.SUBPARTS:
             subpart_grade = find_matches_or_log(
-                f'Score on {subpart}: (\\d+) out of (\\d+)\\.', 
-                output, 
+                f'Score on {subpart}: (\\d+) out of (\\d+)\\.',
+                output,
                 log_file
             )
             subpart_grades[subpart] = subpart_grade
-            
+
         return Result(
-            final_grade, 
+            final_grade,
             subpart_grades,
         )
 
-    except Exception: 
+    except Exception:
         return Result(
             error_msg=f'Could not gather results, see: {log_file}'
         )
@@ -286,12 +288,12 @@ def main(src_gradebook: Path, output_gradebook: Path) -> None:
         )
 
         log_file_path = submission.tar_path.with_suffix('.log')
-        # clear contents of log file just in case 
-        open(log_file_path, "w").close() 
+        # clear contents of log file just in case
+        open(log_file_path, "w").close()
 
         invoke_make_clean(
             submission.extracted_path / CONFIG.CURRENT_PA,
-            log_file_path, 
+            log_file_path,
         )
 
         results = exec_grading_script(
