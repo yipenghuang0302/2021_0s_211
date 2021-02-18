@@ -9,10 +9,23 @@ from bstReverseOrder import autograder as bstReverseOrder_autograder
 total = 0
 
 total += goldbach_autograder.grade_goldbach ( prefix="goldbach/", verbose=False )
-total += maximum_autograder.grade_maximum ( prefix="maximum/", verbose=False )
-total += matMul_autograder.grade_matMul ( prefix="matMul/", verbose=False )
+
+try:
+    total += maximum_autograder.grade_maximum ( prefix="maximum/", verbose=False )
+except ValueError:
+    pass
+
+try:
+    total += matMul_autograder.grade_matMul ( prefix="matMul/", verbose=False )
+except ValueError:
+    pass
+
 total += balanced_autograder.grade_balanced ( prefix="balanced/", verbose=False )
-total += bstReverseOrder_autograder.grade_bstReverseOrder ( prefix="bstReverseOrder/", verbose=False )
+
+try:
+    total += bstReverseOrder_autograder.grade_bstReverseOrder ( prefix="bstReverseOrder/", verbose=False )
+except ValueError:
+    pass
 
 print ("Score on assignment: {} out of 110.".format(total))
 print ("The remaining 10 points will be assigned as part of recitation discussion.")
