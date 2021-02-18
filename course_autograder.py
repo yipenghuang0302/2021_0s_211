@@ -30,7 +30,7 @@ class CONFIG:
         'maximum',
     )
     SUBMISSIONS_DIR = 'submissions'
-    TIME_LIMIT = timedelta(minutes=5)
+    TIME_LIMIT = timedelta(seconds=30)
 
 
 class Result(NamedTuple):
@@ -105,7 +105,7 @@ class StudentGradeWriter:
                 else:
                     row[self._assignment_name] = results.final_grade
                     for subpart in CONFIG.SUBPARTS:
-                        row[subpart] = results.subpart_grades[subpart]
+                        row[subpart] = results.subpart_grades.get(subpart,0)
                 writer.writerow(row)
 
 
@@ -203,6 +203,7 @@ def invoke_make_clean(
 
 
 def exec_grading_script(path: Path, log_file: Path) -> Result:
+    output = ""
     try:
         result = subprocess.run(
             ['python3', str(path.name)],
@@ -219,11 +220,10 @@ def exec_grading_script(path: Path, log_file: Path) -> Result:
         return Result(
             error_msg='timed out'
         )
-
     except subprocess.CalledProcessError as ex:
         output = ex.stdout
         return Result(
-            error_msg='assignment_autograder.py returend non-zero exit status 1.'
+            error_msg='assignment_autograder.py returned non-zero exit status 1.'
         )
     finally:
         with log_file.open('a') as f:
@@ -250,25 +250,27 @@ def gather_results(output: str, log_file: Path) -> Result:
             output,
             log_file,
         )
+    except Exception:
+        return Result(
+            error_msg=f'Could not gather score on assignment; see: {log_file}'
+        )
 
-        subpart_grades = {}
-        for subpart in CONFIG.SUBPARTS:
+    subpart_grades = {}
+    for subpart in CONFIG.SUBPARTS:
+        try:
             subpart_grade = find_matches_or_log(
                 f'Score on {subpart}: (\\d+) out of (\\d+)\\.',
                 output,
                 log_file
             )
             subpart_grades[subpart] = subpart_grade
+        except Exception:
+            pass
 
-        return Result(
-            final_grade,
-            subpart_grades,
-        )
-
-    except Exception:
-        return Result(
-            error_msg=f'Could not gather results, see: {log_file}'
-        )
+    return Result(
+        final_grade,
+        subpart_grades,
+    )
 
 
 def main(src_gradebook: Path, output_gradebook: Path) -> None:
@@ -307,6 +309,6 @@ def main(src_gradebook: Path, output_gradebook: Path) -> None:
 
 if __name__ == '__main__':
     main(
-        Path('2021-02-14T0032_Grades-01_198_211_05_COMPUTER_ARCHITECTUR.csv'),
+        Path('2021-02-16T0056_Grades-01_198_211_05_COMPUTER_ARCHITECTUR.csv'),
         Path(f'{CONFIG.CURRENT_PA}_gradebook.csv'),
     )
