@@ -120,7 +120,11 @@ def iter_submissions(submissions_dir: Path) -> Generator[Submission, None, None]
         if not sub_tarball.exists() or not tarfile.is_tarfile(sub_tarball):
             continue
 
-        student_id = sub_tarball.name.split('_')[1]
+        if "LATE" in sub_tarball.name:
+            student_id = sub_tarball.name.split('_')[2]
+        else:
+            student_id = sub_tarball.name.split('_')[1]
+            
         extract_dir = submissions_dir / f'tmp-{student_id}'
 
         try:
@@ -309,6 +313,6 @@ def main(src_gradebook: Path, output_gradebook: Path) -> None:
 
 if __name__ == '__main__':
     main(
-        Path('2021-02-16T0056_Grades-01_198_211_05_COMPUTER_ARCHITECTUR.csv'),
+        Path('2021-02-19T2038_Grades-01_198_211_05_COMPUTER_ARCHITECTUR.csv'),
         Path(f'{CONFIG.CURRENT_PA}_gradebook.csv'),
     )

@@ -8,7 +8,10 @@ from bstReverseOrder import autograder as bstReverseOrder_autograder
 
 total = 0
 
-total += goldbach_autograder.grade_goldbach ( prefix="goldbach/", verbose=False )
+try:
+    total += goldbach_autograder.grade_goldbach ( prefix="goldbach/", verbose=False )
+except ValueError:
+    pass
 
 try:
     total += maximum_autograder.grade_maximum ( prefix="maximum/", verbose=False )
