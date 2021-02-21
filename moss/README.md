@@ -23,7 +23,7 @@ Structure:
 ./moss -l c -c "[message]" -b [all provided .c/.h files] -m [N] -d [type of file in directory]
 
 Example use:
-./moss -l c -c "CS 211 Programming Assignment 1" -c -b balanced_provided.c -b bstReverseOrder_provided.c -m 10 -d submissions/*/*/*/*.c
+./moss -l c -c "CS 211 Programming Assignment 1" -c -b balanced_provided.c -b bstReverseOrder_provided.c -m 10 -d submissions/\*/\*/\*/\*.c
 
 * -l flag specifies the programming language (C)
 * -c flag specifies a message that will be attached to the result
