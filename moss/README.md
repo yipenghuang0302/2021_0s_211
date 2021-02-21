@@ -32,5 +32,5 @@ Example use:
 * -m flag specifies the number of times that a piece of code can be found until it stops counting toward plagiarism
 
 ### NOTES
-- 'submissions/*/*/*/*.c' specifies that the files to compare are any C files in the third level subdirectory in submissions
+- 'submissions/\*/\*/\*/\*.c' specifies that the files to compare are any C files in the third level subdirectory in submissions
 - In the Python script, this is optimized by including the specific file names and not just any C file so that only the files we want to test will be submitted.
