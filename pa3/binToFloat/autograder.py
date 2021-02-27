@@ -95,7 +95,7 @@ def grade_binToFloat( path='./', verbose=False ):
 
                             # standard range test
                             allpass = True
-                            for filenum in range(4,8):
+                            for filenum in range(6,12):
                                 generate_test (
                                     filenum,
                                     float = random.uniform(
