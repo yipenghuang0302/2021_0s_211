@@ -12,7 +12,7 @@ def twos_comp(val, bits):
         val = val - (1 << bits)        # compute negative value
     return val & ((2 ** bits) - 1)     # return positive value, masked
 
-def generate_test ( filenum, negative=False, bound=16384, path="./" ):
+def generate_test ( filenum, negative=False, bound=32768, path="./" ):
 
     number = random.randrange(-bound, 0) if negative else random.randrange(bound)
 
