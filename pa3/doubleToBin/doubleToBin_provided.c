@@ -23,14 +23,14 @@ int main(int argc, char *argv[]) {
     fscanf(fp, "%lf", &value);
 
     // the reference solution ('the easy way')
-    // you are not allowed to print from this casted 'bits' variable below
+    // you are not allowed to print from this casted 'ref_bits' variable below
     // but, it is helpful for validating your solution
-    unsigned long int bits = *(unsigned long int*) &value;
+    unsigned long int ref_bits = *(unsigned long int*) &value;
 
     // THE SIGN BIT
     bool sign = value<0.0;
     printf("%d_",sign);
-    assert (sign == (1&bits>>(EXP_SZ+FRAC_SZ))); // validate your result against the reference
+    assert (sign == (1&ref_bits>>(EXP_SZ+FRAC_SZ))); // validate your result against the reference
 
     // THE EXP FIELD
     // find the exponent E such that the fraction will be a canonical fraction:
@@ -47,7 +47,7 @@ int main(int argc, char *argv[]) {
     for ( int exp_index=EXP_SZ-1; 0<=exp_index; exp_index-- ) {
         bool exp_bit = 1&exp>>exp_index;
         printf("%d",exp_bit);
-        assert (exp_bit == (1&bits>>(exp_index+FRAC_SZ))); // validate your result against the reference
+        assert (exp_bit == (1&ref_bits>>(exp_index+FRAC_SZ))); // validate your result against the reference
     }
     printf("_");
     // you get partial credit by getting the exp field correct
@@ -59,7 +59,7 @@ int main(int argc, char *argv[]) {
     // 1.0 <= fraction < 2.0
     /* ... */
 
-    bool frac_array[FRAC_SZ+1]; // one extra bit at end for rounding
+    bool frac_array[FRAC_SZ+1]; // one extra LSB bit for rounding
     for ( int frac_index=FRAC_SZ; 0<=frac_index; frac_index-- ) {
         frac_array[frac_index] = false; // frac set to zero to enable partial credit
         /* ... */
@@ -69,9 +69,9 @@ int main(int argc, char *argv[]) {
     /* ... */
 
     for ( int frac_index=FRAC_SZ-1; 0<=frac_index; frac_index-- ) {
-        bool frac_bit = frac_array[frac_index+1];
+        bool frac_bit = frac_array[frac_index+1]; // skipping the extra LSB bit for rounding
         printf("%d", frac_bit);
-        // assert (frac_bit == (1&bits>>frac_index)); // validate your result against the reference
+        // assert (frac_bit == (1&ref_bits>>frac_index)); // validate your result against the reference
     }
 
 }

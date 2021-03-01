@@ -96,7 +96,7 @@ def grade_doubleToBin( path='./', verbose=False ):
 
                             # standard range test
                             allpass = True
-                            for filenum in range(4,8):
+                            for filenum in range(6,10):
                                 generate_test (
                                     filenum,
                                     double = random.uniform(
@@ -111,7 +111,7 @@ def grade_doubleToBin( path='./', verbose=False ):
 
                             # high magnitude test
                             allpass = True
-                            for filenum in range(8,12):
+                            for filenum in range(10,14):
                                 generate_test (
                                     filenum,
                                     double = random.uniform(
@@ -126,7 +126,7 @@ def grade_doubleToBin( path='./', verbose=False ):
 
                             # denormalized range test
                             allpass = True
-                            for filenum in range(12,16):
+                            for filenum in range(14,18):
                                 generate_test (
                                     filenum,
                                     double = random.uniform(
@@ -140,7 +140,7 @@ def grade_doubleToBin( path='./', verbose=False ):
                                 score += 3
 
                             # negative zero test
-                            generate_test ( 16, -0.0, path=path )
+                            generate_test ( 18, -0.0, path=path )
                             if test_doubleToBin(16,path,verbose):
                                 score += 1
 
@@ -148,6 +148,6 @@ def grade_doubleToBin( path='./', verbose=False ):
     return score
 
 if __name__ == '__main__':
-    generate_test_suite()
+    # generate_test_suite()
     grade_doubleToBin(verbose=True)
     exit()
