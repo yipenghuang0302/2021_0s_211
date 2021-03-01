@@ -20,21 +20,18 @@ int main(int argc, char *argv[]) {
     char buff;
     unsigned int binary = 0;
     for (int i=EXP_SZ+FRAC_SZ; 0<=i; i--) { // read MSB first as that is what comes first in the file
-        fscanf(fp, "%c", &buff);
-        binary += buff=='1' ? 1<<i : 0;
+        /* ... */
     }
 
-    bool sign = 1&binary>>31;
+    // float number = *(float *)&binary; // you are not allowed to do this.
+
+    /* ... */
 
     // E
-    unsigned short exp = ((1<<EXP_SZ)-1) & binary>>FRAC_SZ;
-    unsigned short bias = (1<<(EXP_SZ-1))-1;
-    signed short e = exp - bias;
+    /* ... */
 
     // M
-    unsigned int frac = ((1<<FRAC_SZ)-1) & binary;
-    frac += 1<<FRAC_SZ;
-    double m = (double)frac / (double)(1<<FRAC_SZ);
+    /* ... */
 
     // https://www.tutorialspoint.com/c_standard_library/c_function_ldexp.htm
     double number = ldexp ( m, e );
