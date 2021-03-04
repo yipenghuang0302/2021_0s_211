@@ -21,13 +21,13 @@ from typing import Dict, Generator, NamedTuple, Optional, Sequence
 
 
 class CONFIG:
-    CURRENT_PA = 'pa1'
+    CURRENT_PA = 'pa2'
     SUBPARTS = (
-        'balanced',
-        'bstReverseOrder',
-        'goldbach',
-        'matMul',
-        'maximum',
+        'edgelist',
+        'isTree',
+        'solveMaze',
+        'mst',
+        'findCycle',
     )
     SUBMISSIONS_DIR = 'submissions'
     TIME_LIMIT = timedelta(seconds=30)
@@ -124,7 +124,7 @@ def iter_submissions(submissions_dir: Path) -> Generator[Submission, None, None]
             student_id = sub_tarball.name.split('_')[2]
         else:
             student_id = sub_tarball.name.split('_')[1]
-            
+
         extract_dir = submissions_dir / f'tmp-{student_id}'
 
         try:
@@ -210,7 +210,7 @@ def exec_grading_script(path: Path, log_file: Path) -> Result:
     output = ""
     try:
         result = subprocess.run(
-            ['python3', str(path.name)],
+            ['python2', str(path.name)],
             cwd=path.parent,
             check=True,
             stdout=subprocess.PIPE,
@@ -313,6 +313,6 @@ def main(src_gradebook: Path, output_gradebook: Path) -> None:
 
 if __name__ == '__main__':
     main(
-        Path('2021-02-19T2038_Grades-01_198_211_05_COMPUTER_ARCHITECTUR.csv'),
+        Path('2021-03-03T0028_Grades-01_198_211_05_COMPUTER_ARCHITECTUR.csv'),
         Path(f'{CONFIG.CURRENT_PA}_gradebook.csv'),
     )
