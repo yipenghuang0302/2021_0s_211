@@ -1,4 +1,4 @@
-OUTPUT=swap
+OUTPUT=greater_than
 CC=gcc
 CFLAGS=-Os -Wall -Werror -std=c99
 ASM = swap.s
