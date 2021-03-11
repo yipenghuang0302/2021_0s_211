@@ -1,4 +1,4 @@
-OUTPUT=branch
+OUTPUT=switch
 CC=gcc
 CFLAGS=-Os -Wall -Werror -std=c99
 ASM = swap.s
