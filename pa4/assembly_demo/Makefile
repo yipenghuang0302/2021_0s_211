@@ -1,10 +1,10 @@
-OUTPUT=switch
+OUTPUT=recursion
 CC=gcc
-CFLAGS=-Os -Wall -Werror -std=c99
+CFLAGS=-Og -Wall -Werror -std=c99
 ASM = swap.s
 
 %.s: %.c
-	$(CC) $(CFLAGS) -S -fno-if-conversion $^ -o $@
+	$(CC) $(CFLAGS) -S -fno-inline -fno-if-conversion $^ -o $@
 
 $(OUTPUT): $(OUTPUT).s
 	$(CC) $(CFLAGS) $^ -o $@
