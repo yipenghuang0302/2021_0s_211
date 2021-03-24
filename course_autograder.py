@@ -21,13 +21,13 @@ from typing import Dict, Generator, NamedTuple, Optional, Sequence
 
 
 class CONFIG:
-    CURRENT_PA = 'pa2'
+    CURRENT_PA = 'pa3'
     SUBPARTS = (
-        'edgelist',
-        'isTree',
-        'solveMaze',
-        'mst',
-        'findCycle',
+        'toHex',
+        'binSub',
+        'binToFloat',
+        'doubleToBin',
+        'floatMul',
     )
     SUBMISSIONS_DIR = 'submissions'
     TIME_LIMIT = timedelta(seconds=30)
@@ -210,7 +210,7 @@ def exec_grading_script(path: Path, log_file: Path) -> Result:
     output = ""
     try:
         result = subprocess.run(
-            ['python2', str(path.name)],
+            ['python3', str(path.name)],
             cwd=path.parent,
             check=True,
             stdout=subprocess.PIPE,
