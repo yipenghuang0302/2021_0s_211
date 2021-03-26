@@ -1,6 +1,6 @@
-OUTPUT=recursion
+OUTPUT=return
 CC=gcc
-CFLAGS=-Og -Wall -Werror -std=c99
+CFLAGS=-g -Og -Wall -Werror -std=c99
 ASM = swap.s
 
 %.s: %.c
