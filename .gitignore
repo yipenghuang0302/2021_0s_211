@@ -63,4 +63,12 @@ answer_key
 *.csv
 *.xls
 *.xlsx
+
+# Bomb Lab
 bomb*
+
+# Cache Lab
+cachelab.tar
+cachelab/
+.csim_results
+.marker
