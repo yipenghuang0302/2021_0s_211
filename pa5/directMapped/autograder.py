@@ -5,20 +5,22 @@ import os
 import datetime
 import subprocess
 
-def generate_matMul_trace ( filenum, dimension=2, path="./" ):
+def generate_matMul_trace ( n=1 ):
 
-    with open("{}tests/test{}.txt".format(path,filenum), "w") as infile:
+    with open("tests/trace_matMul_{}x{}.txt".format(n,n), "w") as infile:
         trace = subprocess.run(
-            ['valgrind', '--tool=lackey', '--basic-counts=no', '--trace-mem=yes', '--log-fd=1', '../matMul/matMul', str(dimension)],
-            cwd=path,
+            ['valgrind', '--tool=lackey', '--basic-counts=no', '--trace-mem=yes', '--log-fd=1',
+                '../matMul/matMul',
+                '../matMul/tests/matrix_a_{}x{}.txt'.format(n,n),
+                '../matMul/tests/matrix_b_{}x{}.txt'.format(n,n)],
             check=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             encoding='ASCII',
-            timeout=datetime.timedelta(seconds=4).total_seconds(),
+            timeout=datetime.timedelta(seconds=8).total_seconds(),
         )
 
-        with open(".marker".format(path,filenum), "r") as marker_file:
+        with open(".marker", "r") as marker_file:
             start = int(marker_file.readline(),16)
             end = int(marker_file.readline(),16)
 
@@ -39,17 +41,17 @@ def generate_matMul_trace ( filenum, dimension=2, path="./" ):
                 # print(line)
                 pass
 
-def answers_from_csim ( filenum, dimension=2, path="./" ):
+def answers_from_csim ( test_name ):
 
-    with open("{}answers/answer{}.txt".format(path,filenum), "w") as outfile:
+    with open("answers/answer_{}.txt".format(test_name), "w") as outfile:
         csim = subprocess.run(
-            ['../csim-ref', '-s', '4', '-E', '1', '-b', '8', '-t', "{}tests/test{}.txt".format(path,filenum)],
-            cwd=path,
+            ['../csim-ref', '-s', '4', '-E', '1', '-b', '8',
+            '-t', "tests/{}.txt".format(test_name)],
             check=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             encoding='ASCII',
-            timeout=datetime.timedelta(seconds=4).total_seconds(),
+            timeout=datetime.timedelta(seconds=8).total_seconds(),
         )
         outfile.write(csim.stdout)
 
@@ -59,31 +61,30 @@ def generate_test_suite():
     os.makedirs("tests", exist_ok=True)
     os.makedirs("answers", exist_ok=True)
 
-    generate_matMul_trace ( 4, 1 )
-    generate_matMul_trace ( 5, 2 )
-    generate_matMul_trace ( 6, 16 )
-    generate_matMul_trace ( 7, 32 )
-    for filenum in range(8):
-        answers_from_csim ( filenum )
+    for filenum in range(4):
+        answers_from_csim("trace_{}".format(filenum))
 
+    for i in range(6):
+        generate_matMul_trace ( 2**i )
+        answers_from_csim("trace_matMul_{}x{}".format( 2**i, 2**i ));
 
-def test_directMapped ( filenum, path="./", verbose=False ):
+def test_directMapped ( test_name, path="./", verbose=False ):
 
     try:
-        with open("{}answers/answer{}.txt".format(path,filenum), "r") as outfile:
+        with open("{}answers/answer_{}.txt".format(path,test_name), "r") as outfile:
             answer = outfile.read()
     except EnvironmentError: # parent of IOError, OSError
-        print ("answers/answer{}.txt missing".format(filenum))
+        print ("answers/answer_{}.txt missing".format(test_name))
 
     try:
         result = subprocess.run(
-            ['./directMapped', "tests/test{}.txt".format(filenum)],
+            ['./directMapped', "tests/{}.txt".format(test_name)],
             cwd=path,
             check=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             encoding='ASCII',
-            timeout=datetime.timedelta(seconds=4).total_seconds(),
+            timeout=datetime.timedelta(seconds=8).total_seconds(),
         )
         if verbose:
             print (' '.join(result.args))
@@ -91,7 +92,7 @@ def test_directMapped ( filenum, path="./", verbose=False ):
             print (answer)
             print ("result")
             print (result.stdout)
-        assert answer == result.stdout, "The printed result doesn't match answers/answer{}.txt.".format(filenum)
+        assert answer == result.stdout, "The printed result doesn't match answers/answer_{}.txt.".format(test_name)
         return True
     except subprocess.CalledProcessError as e:
         # print (e.output)
@@ -115,9 +116,15 @@ def grade_directMapped( path='./', verbose=False ):
         print ("Couldn't compile directMapped.")
         return score
 
-    for filenum in range(8):
-        if test_directMapped(filenum,path,verbose):
+    for filenum in range(4):
+        if test_directMapped("trace_{}".format(filenum),path,verbose):
             score += 3
+        else:
+            break
+
+    for i in range(6):
+        if test_directMapped("trace_matMul_{}x{}".format(2**i,2**i),path,verbose):
+            score += 2
         else:
             break
 
