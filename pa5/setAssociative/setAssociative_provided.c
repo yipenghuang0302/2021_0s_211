@@ -10,10 +10,10 @@
 typedef unsigned long long int mem_addr_t;
 
 // cache properties
-unsigned char s = 4; // set index bits
-unsigned short S = 1<<4; // set count
+unsigned char s = 2; // set index bits
+unsigned short S = 1<<2; // set count
 
-unsigned char E = 16; // way associative cache; lines per set
+unsigned char E = 4; // way associative cache; lines per set
 
 unsigned char b = 8; // block offset bits
 // unsigned short B = 1<<8; // block size in bytes
