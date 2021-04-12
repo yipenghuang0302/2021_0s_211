@@ -53,7 +53,7 @@ def answers_from_csim ( test_name ):
 
     with open("answers/answer_{}.txt".format(test_name), "w") as outfile:
         csim = subprocess.run(
-            ['../csim-ref', '-s', '4', '-E', '16', '-b', '4', '-l', '1',
+            ['../csim-ref', '-s', '4', '-E', '16', '-b', '8', '-l', '1',
             '-t', "tests/{}.txt".format(test_name)],
             check=True,
             stdout=subprocess.PIPE,
@@ -143,7 +143,7 @@ def test_cacheBlocking ( n, test_name, path="./", verbose=False ):
     try:
         generate_trace ( n=n, path=path, dut='./cacheBlocking', trace_path="cacheBlocking_trace_{}.txt".format(test_name) )
         csim = subprocess.run(
-            ['../csim-ref', '-s', '2', '-E', '4', '-b', '12', '-l', '1',
+            ['../csim-ref', '-s', '4', '-E', '16', '-b', '8', '-l', '1',
             '-t', "cacheBlocking_trace_{}.txt".format(test_name)],
             cwd=path,
             check=True,
@@ -162,8 +162,9 @@ def test_cacheBlocking ( n, test_name, path="./", verbose=False ):
 
         result_tallies = list(map(int, re.findall(r'\d+', csim.stdout)))
         assert answer_tallies[0] < result_tallies[0], "Cache hits need to be more numerous than baseline."
-        assert answer_tallies[1] > result_tallies[1], "Cache misses need to be less numerous than baseline."
+        assert answer_tallies[1] >= result_tallies[1], "Cache misses need to be less numerous than baseline."
         assert answer_tallies[2] >= result_tallies[2], "Cache evictions need to be less numerous than baseline."
+        assert result_tallies[2] == 0, "For full credit, there should be no cache evictions."
         return True
     except subprocess.CalledProcessError as e:
         print (e.output)
