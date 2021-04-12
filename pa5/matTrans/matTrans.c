@@ -6,24 +6,6 @@
 /* Markers used to bound trace regions of interest */
 volatile char MARKER_START, MARKER_END;
 
-// Cache oblivious matrix transpose
-// https://en.wikipedia.org/wiki/Cache-oblivious_algorithm
-void recursiveMatTrans (
-    size_t global_n,
-    size_t n,
-    int* A, size_t offset_row_A, size_t offset_col_A,
-    int* B, size_t offset_row_B, size_t offset_col_B
-) {
-    if (n==1) {
-        B[ offset_row_B*global_n + offset_col_B ] = A[ offset_row_A*global_n + offset_col_A ];
-    } else {
-        recursiveMatTrans ( global_n, n>>1, A, offset_row_A,        offset_col_A,        B, offset_row_B,        offset_col_B        );
-        recursiveMatTrans ( global_n, n>>1, A, offset_row_A,        offset_col_A+(n>>1), B, offset_row_B+(n>>1), offset_col_B        );
-        recursiveMatTrans ( global_n, n>>1, A, offset_row_A+(n>>1), offset_col_A,        B, offset_row_B,        offset_col_B+(n>>1) );
-        recursiveMatTrans ( global_n, n>>1, A, offset_row_A+(n>>1), offset_col_A+(n>>1), B, offset_row_B+(n>>1), offset_col_B+(n>>1) );
-    }
-}
-
 int main(int argc, char* argv[])
 {
 
@@ -57,7 +39,11 @@ int main(int argc, char* argv[])
 
     int* b = calloc( n*n, sizeof(int) );
     MARKER_START = 211;
-    recursiveMatTrans ( n, n, a, 0, 0, b, 0, 0 );
+    for ( size_t i=0; i<n; i++ ) {
+        for ( size_t j=0; j<n; j++ ) {
+            b[ j*n + i ] = a[ i*n + j ];
+        }
+    }
     MARKER_END = 211;
 
     for ( size_t i=0; i<n; i++ ) {
