@@ -1,1 +1,1 @@
-hits:6 misses:3 evictions:0
+hits:4 misses:5 evictions:3

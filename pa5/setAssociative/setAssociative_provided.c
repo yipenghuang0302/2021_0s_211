@@ -15,8 +15,8 @@ unsigned short S = 1<<2; // set count
 
 unsigned char E = 4; // way associative cache; lines per set
 
-unsigned char b = 8; // block offset bits
-// unsigned short B = 1<<8; // block size in bytes
+unsigned char b = 4; // block offset bits
+// unsigned short B = 1<<4; // block size in bytes
 
 // fully associative cache line
 typedef struct cache_line {

@@ -45,7 +45,7 @@ def answers_from_csim ( test_name ):
 
     with open("answers/answer_{}.txt".format(test_name), "w") as outfile:
         csim = subprocess.run(
-            ['../csim-ref', '-s', '0', '-E', '16', '-b', '8', '-l', '0',
+            ['../csim-ref', '-s', '0', '-E', '16', '-b', '4', '-l', '0',
             '-t', "tests/{}.txt".format(test_name)],
             check=True,
             stdout=subprocess.PIPE,
@@ -99,7 +99,7 @@ def test_fullyAssociative ( test_name, path="./", verbose=False ):
         print ("Calling ./fullyAssociative returned non-zero exit status.")
     except ValueError as e:
         print (result.stdout)
-        print ("Please check your output formatting; it should be formatted as a hexadecimal number.")
+        print ("Please check your output formatting.")
     except AssertionError as e:
         print (result.stdout)
         print (e.args[0])
@@ -132,6 +132,6 @@ def grade_fullyAssociative( path='./', verbose=False ):
     return score
 
 if __name__ == '__main__':
-    generate_test_suite()
+    # generate_test_suite()
     grade_fullyAssociative(verbose=True)
     exit()

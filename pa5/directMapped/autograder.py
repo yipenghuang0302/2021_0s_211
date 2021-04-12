@@ -45,7 +45,7 @@ def answers_from_csim ( test_name ):
 
     with open("answers/answer_{}.txt".format(test_name), "w") as outfile:
         csim = subprocess.run(
-            ['../csim-ref', '-s', '4', '-E', '1', '-b', '8',
+            ['../csim-ref', '-s', '4', '-E', '1', '-b', '4',
             '-t', "tests/{}.txt".format(test_name)],
             check=True,
             stdout=subprocess.PIPE,
@@ -99,7 +99,7 @@ def test_directMapped ( test_name, path="./", verbose=False ):
         print ("Calling ./directMapped returned non-zero exit status.")
     except ValueError as e:
         print (result.stdout)
-        print ("Please check your output formatting; it should be formatted as a hexadecimal number.")
+        print ("Please check your output formatting.")
     except AssertionError as e:
         print (result.stdout)
         print (e.args[0])
