@@ -1,0 +1,4 @@
+INPUTVAR 2 input0 input1
+OUTPUTVAR 1 output0
+NOR 2 input1 input0 temp0
+NOT temp0 output0

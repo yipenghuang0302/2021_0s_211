@@ -1,0 +1,8 @@
+INPUTVAR 2 input0 input1
+OUTPUTVAR 2 output0 output1
+NOR 2 input0 input0 temp0
+NAND 2 input1 temp0 temp1
+AND 4 temp1 temp1 input0 input0 temp2
+NOR 3 input1 temp0 temp2 temp3
+AND 4 temp0 input0 temp0 input0 output0
+NOT input0 output1

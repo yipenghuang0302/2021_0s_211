@@ -1,0 +1,3 @@
+INPUTVAR 1 input0
+OUTPUTVAR 1 output0
+NOT input0 output0
