@@ -1,0 +1,4 @@
+INPUTVAR 2 input0 input1
+OUTPUTVAR 1 output0
+NAND input0 input0 temp0
+XNOR input1 temp0 output0
